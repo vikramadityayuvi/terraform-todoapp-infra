@@ -31,9 +31,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init \
-          -backend-config="testrg=${{ secrets.AZURE_RG }}" \
-          -backend-config="testsg=${{ secrets.AZURE_STORAGE }}" \
-          -backend-config="tfstate=${{ secrets.AZURE_CONTAINER }}" \
+          -backend-config="resource_group_name=${{ secrets.AZURE_RG }}" \
+          -backend-config="storage_account_name=${{ secrets.AZURE_STORAGE }}" \
+          -backend-config="container_name=${{ secrets.AZURE_CONTAINER }}" \
           -backend-config="key=dev.tfstate"
 
       - name: Terraform Validate
