@@ -1,4 +1,4 @@
-name: Terraform Azure Pipeline
+name: Terraform Plan Pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - 'feature/**'
 
 jobs:
-  terraform:
+  terraform-plan:
     runs-on: ubuntu-latest
 
     defaults:
@@ -23,7 +23,6 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          # isme tum Service Principal JSON daloge
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -32,17 +31,13 @@ jobs:
 
       - name: Terraform Init
         run: terraform init \
-          -backend-config="resource_group_name=${{ secrets.AZURE_RG }}" \
-          -backend-config="storage_account_name=${{ secrets.AZURE_STORAGE }}" \
-          -backend-config="container_name=${{ secrets.AZURE_CONTAINER }}" \
+          -backend-config="testrg=${{ secrets.AZURE_RG }}" \
+          -backend-config="testsg=${{ secrets.AZURE_STORAGE }}" \
+          -backend-config="tfstate=${{ secrets.AZURE_CONTAINER }}" \
           -backend-config="key=dev.tfstate"
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve tfplan
+        run: terraform plan
