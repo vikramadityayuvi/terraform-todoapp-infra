@@ -1,0 +1,48 @@
+name: Terraform Azure Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform   # apna terraform folder path daalna
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Azure Login
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          # isme tum Service Principal JSON daloge
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init \
+          -backend-config="resource_group_name=${{ secrets.AZURE_RG }}" \
+          -backend-config="storage_account_name=${{ secrets.AZURE_STORAGE }}" \
+          -backend-config="container_name=${{ secrets.AZURE_CONTAINER }}" \
+          -backend-config="key=dev.tfstate"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
