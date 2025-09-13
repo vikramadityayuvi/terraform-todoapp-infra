@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./terraform   # apna terraform folder path daalna
+        working-directory: environments/dev   # yahi se terraform commands chalenge
 
     steps:
       - name: Checkout repo
