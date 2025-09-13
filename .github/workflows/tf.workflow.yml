@@ -48,7 +48,7 @@ jobs:
 
       # Upload Plan file as artifact (optional)
       - name: Upload Plan Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tfplan
           path: environments/dev/tfplan
