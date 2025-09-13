@@ -32,11 +32,12 @@ jobs:
 
       # Terraform Init with Azure backend (hardcoded values)
       - name: Terraform Init
-        run: terraform init \
-          -backend-config="resource_group_name=testrg" \
-          -backend-config="storage_account_name=testsg" \
-          -backend-config="container_name=tfstate" \
-          -backend-config="key=dev.tfstate"
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=testrg" \
+            -backend-config="storage_account_name=testsg" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=dev.tfstate"
 
       # Validate code
       - name: Terraform Validate
