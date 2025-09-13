@@ -12,32 +12,43 @@ jobs:
 
     defaults:
       run:
-        working-directory: environments/dev   # yahi se terraform commands chalenge
+        working-directory: environments/dev   # Terraform code yaha hai
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # Azure Login
+      # Azure Login using Service Principal
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Install Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
+      # Terraform Init with Azure backend (hardcoded values)
       - name: Terraform Init
         run: terraform init \
-          -backend-config="resource_group_name=${{ secrets.AZURE_RG }}" \
-          -backend-config="storage_account_name=${{ secrets.AZURE_STORAGE }}" \
-          -backend-config="container_name=${{ secrets.AZURE_CONTAINER }}" \
+          -backend-config="resource_group_name=testrg" \
+          -backend-config="storage_account_name=testsg" \
+          -backend-config="container_name=tfstate" \
           -backend-config="key=dev.tfstate"
 
+      # Validate code
       - name: Terraform Validate
         run: terraform validate
 
+      # Plan only
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -out=tfplan
+
+      # Upload Plan file as artifact (optional)
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: environments/dev/tfplan
