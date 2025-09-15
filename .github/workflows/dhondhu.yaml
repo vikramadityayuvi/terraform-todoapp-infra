@@ -2,6 +2,11 @@ name: "Infra Pipeline for Dhondhu"
 
 on: workflow_dispatch
 
+permissions:
+  id-token: write
+  contents: read
+  
+
 
 jobs:
   terraform-job:
@@ -9,9 +14,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
-      - name: Install Terraform
-  
-        uses: little-core-labs/install-terraform@v2.0.0
+      
+      - name: Azure Login
+        uses: Azure/login@v2.3.0
         with:
-    
-          version: 1.13.0
+          client-id: 40e9fddb-2bca-4f1a-96c7-75d78f476c6f
+          tenant-id: 5792dd07-62dc-48ac-a7ae-855280503fdb
+          subscription-id: 76095b6e-0585-402e-8e43-281835aebfd1
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        working-directory: environment/dev 
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+        working-directory: environment/dev
