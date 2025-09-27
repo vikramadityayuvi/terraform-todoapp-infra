@@ -5,15 +5,12 @@ on:
     branches:
       - main
   push:
-      branches:
-        - main
-      
+    branches:
+      - main
 
 permissions:
   id-token: write
   contents: read
-  
-
 
 jobs:
   terraform-job:
@@ -21,18 +18,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
-      
+
       - name: Azure Login
         uses: Azure/login@v2.3.0
         with:
-          client-id: 40e9fddb-2bca-4f1a-96c7-75d78f476c6f
-          tenant-id: 5792dd07-62dc-48ac-a7ae-855280503fdb
-          subscription-id: 76095b6e-0585-402e-8e43-281835aebfd1
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
         continue-on-error: true
-        working-directory: environments/dev 
+        working-directory: environments/dev
+
       - name: Terraform Init
         id: init
         run: terraform init -input=false
@@ -42,4 +41,4 @@ jobs:
         id: plan
         run: terraform plan -no-color -input=false
         continue-on-error: true
-        working-directory: environments/dev  
+        working-directory: environments/dev
